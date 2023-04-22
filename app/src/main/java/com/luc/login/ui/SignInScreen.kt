@@ -1,15 +1,12 @@
 package com.luc.login.ui
 
 import android.content.res.Configuration
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.KeyboardArrowRight
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -17,16 +14,36 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.luc.login.R
+import com.luc.login.domain.model.User
+import com.luc.login.presentation.viewmodel.AuthViewModel
 import com.luc.login.ui.common.LoginButton
 import com.luc.login.ui.common.LoginTextField
 import com.luc.login.ui.theme.MainApplicationTheme
+import org.koin.androidx.compose.getViewModel
 
 @Composable
-fun SignInScreen() {
+fun SignInScreen(navigateToSignUp: () -> Unit, navigateToHome: (User) -> Unit) {
+
+    val userAuthViewModel: AuthViewModel = getViewModel()
+    val userCredentialState by userAuthViewModel.userCredentialsStatus.collectAsState()
+    val userState by userAuthViewModel.user.collectAsState()
+
+    var enabledButton by remember {
+        mutableStateOf(false)
+    }
+
+    enabledButton = userCredentialState.isEmailValid && userCredentialState.isPasswordValid
+
+    userState.user?.let {
+        navigateToHome(it)
+    }
+    userState.error?.let {
+        Log.d("tests", it)
+    }
+
     Column(
         Modifier
             .fillMaxSize()
@@ -46,9 +63,9 @@ fun SignInScreen() {
         LoginTextField(
             Modifier.fillMaxWidth(),
             stringResource(id = R.string.email),
-            "example.name@domain.com",
+            stringResource(R.string.email_example),
             onValueChange = {
-
+                userAuthViewModel.validateEmail(it)
             }
         )
 
@@ -56,35 +73,72 @@ fun SignInScreen() {
 
         LoginTextField(
             Modifier.fillMaxWidth(),
-            stringResource(id = R.string.password),
-            "min. 8 characters",
+            stringResource(id = R.string.your_password),
+            stringResource(R.string.password_example),
             PasswordVisualTransformation(),
             onValueChange = {
-
+                userAuthViewModel.validatePassword(it)
             }
         )
-        LoginButtons()
+
+        SignInDefaultButton(
+            enabled = enabledButton,
+            onClick = {
+                userAuthViewModel.signInDefault(
+                    userCredentialState.email,
+                    userCredentialState.password
+                )
+            })
+
+        Spacer(modifier = Modifier.weight(1f))
+
+        SignUpDefault { navigateToSignUp() }
     }
 }
 
 @Composable
-fun LoginButtons() {
+fun SignInDefaultButton(enabled: Boolean = false, onClick: () -> Unit) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         LoginButton(
-            onClick = { /*TODO*/ },
+            onClick = onClick,
             text = "Continue",
             modifier = Modifier.fillMaxWidth(),
-            paddingValues = PaddingValues(top = 30.dp)
+            paddingValues = PaddingValues(top = 30.dp),
+            enabled = enabled
         )
-        Text(text = "or", Modifier.padding(top = 30.dp, bottom = 30.dp))
-        SignUpButton(text = "Sign up with Google")
+        OrDivider()
+        SignUpBrandButton(text = "Sign up with Google")
         Spacer(modifier = Modifier.height(20.dp))
-        SignUpButton(text = "Sign up with Facebook", painterResource(id = R.drawable.facebook))
+        SignUpBrandButton(text = "Sign up with Facebook", painterResource(id = R.drawable.facebook))
     }
 }
 
 @Composable
-fun SignUpButton(
+fun OrDivider() {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.padding(top = 30.dp, bottom = 30.dp)
+    ) {
+        Divider(
+            thickness = 1.dp,
+            modifier = Modifier.weight(1f),
+            color = MaterialTheme.colorScheme.surfaceTint.copy(alpha = 0.2f)
+        )
+        Text(
+            text = "or",
+            modifier = Modifier.padding(horizontal = 12.dp),
+            color = MaterialTheme.colorScheme.primary
+        )
+        Divider(
+            thickness = 1.dp,
+            modifier = Modifier.weight(1f),
+            color = MaterialTheme.colorScheme.surfaceTint.copy(alpha = 0.2f)
+        )
+    }
+}
+
+@Composable
+fun SignUpBrandButton(
     text: String,
     painter: Painter = painterResource(id = com.google.firebase.firestore.R.drawable.googleg_standard_color_18),
 ) {
@@ -110,6 +164,22 @@ fun SignUpButton(
 }
 
 @Composable
+fun SignUpDefault(onClick: () -> Unit) {
+
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Text(
+            text = "Don't have any account?",
+            modifier = Modifier.padding(end = 6.dp),
+            color = MaterialTheme.colorScheme.primary
+        )
+        TextButton(onClick = { onClick() }) {
+            Text(text = "Sign Up")
+        }
+    }
+
+}
+
+@Composable
 fun HeaderLogo() {
     Row(verticalAlignment = Alignment.CenterVertically) {
         Image(
@@ -120,7 +190,8 @@ fun HeaderLogo() {
         Spacer(modifier = Modifier.width(15.dp))
         Text(
             text = stringResource(id = R.string.app_title),
-            style = MaterialTheme.typography.displaySmall
+            style = MaterialTheme.typography.displaySmall,
+            color = MaterialTheme.colorScheme.primary
         )
     }
 }
@@ -131,7 +202,7 @@ fun HeaderLogo() {
 private fun NightPreview() {
     MainApplicationTheme {
         Surface(color = MaterialTheme.colorScheme.background) {
-            SignInScreen()
+            SignInScreen({},{})
         }
     }
 }
@@ -141,7 +212,7 @@ private fun NightPreview() {
 private fun LightPreview() {
     MainApplicationTheme {
         Surface(color = MaterialTheme.colorScheme.background) {
-            SignInScreen()
+            SignInScreen({},{})
         }
     }
 }
@@ -155,5 +226,8 @@ fun TextFieldsPreview() {
         }
     }
 }
+
+private fun credentialValidator(email: String = "", password: String = "") =
+    email.length in 4..9 && password.length > 8
 
 

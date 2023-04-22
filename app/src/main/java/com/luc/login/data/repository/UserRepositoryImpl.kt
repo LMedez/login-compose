@@ -2,7 +2,7 @@ package com.luc.login.data.repository
 
 import com.luc.login.data.ResultStatus
 import com.luc.login.data.local.LocalDataSource
-import com.luc.login.data.remote.firebase.FirestoreDataSource
+import com.luc.login.data.remote.firebase.firestore.FirestoreDataSource
 import com.luc.login.domain.UserRepository
 import com.luc.login.domain.model.User
 import kotlinx.coroutines.delay
@@ -16,7 +16,7 @@ class UserRepositoryImpl(
             // This is the normal code you call when room has data
             // val localData = localDataSource.getUserEntity(id).asUser()
             delay(3000)
-            ResultStatus.Success(User("Model Data", 1))
+            ResultStatus.Success(User("Model Data", "",""))
         } catch (e: Exception) {
             ResultStatus.Error(e)
         }
