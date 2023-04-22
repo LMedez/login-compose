@@ -29,6 +29,7 @@ import com.google.gson.reflect.TypeToken
 import com.luc.login.domain.model.User
 import com.luc.login.ui.HomeScreen
 import com.luc.login.ui.SignInScreen
+import com.luc.login.ui.SignUpScreen
 
 @Composable
 fun MainNavigation() {
@@ -37,13 +38,23 @@ fun MainNavigation() {
 
     NavHost(navController = navController, startDestination = NavDestination.MainScreen.route) {
         composable(NavDestination.MainScreen.route) {
-            MainScreen(navigateToSignIn = {
-                actions.signIn(it)
-            })
+            MainScreen(
+                navigateToSignIn = { actions.signInScreen(it) }
+            )
         }
 
         composable(NavDestination.SignInScreen.route) {
-            SignInScreen()
+            SignInScreen (
+                navigateToSignUp = { actions.signUpScreen(it) },
+                navigateToHome = { user -> actions.homeScreen(user, it) }
+            )
+        }
+
+        composable(NavDestination.SignUpScreen.route) {
+            SignUpScreen(
+                navigateToSignIn = { navController.popBackStack() },
+                navigateToHome = { user -> actions.homeScreen(user, it) }
+            )
         }
 
         composable(
@@ -71,9 +82,13 @@ class MainActions(navController: NavHostController) {
             navController.navigate("${NavDestination.HomeScreen.route}/$userJson")
     }
 
-    val signIn: (NavBackStackEntry) -> Unit = {
+    val signInScreen: (NavBackStackEntry) -> Unit = {
         if (it.lifecycleIsResumed())
             navController.navigate(NavDestination.SignInScreen.route)
+    }
+    val signUpScreen: (NavBackStackEntry) -> Unit = {
+        if (it.lifecycleIsResumed())
+            navController.navigate(NavDestination.SignUpScreen.route)
     }
 }
 

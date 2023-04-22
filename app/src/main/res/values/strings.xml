@@ -20,5 +20,9 @@
     <string name="app_subtitle1">A platform built for a new way of working</string>
     <string name="app_subtitle2">Work without limits.</string>
     <string name="email">Your email address</string>
-    <string name="password">Choose a password</string>
+    <string name="your_password">Your password</string>
+    <string name="choose_password">Choose a password</string>
+    <string name="full_name">Full name</string>
+    <string name="email_example">example.name@domain.com</string>
+    <string name="password_example">min. 8 characters</string>
 </resources>

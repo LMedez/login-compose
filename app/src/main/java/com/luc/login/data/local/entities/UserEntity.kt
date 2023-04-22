@@ -22,11 +22,14 @@ import androidx.room.PrimaryKey
 
 @Entity
 data class UserEntity(
+    @PrimaryKey
+    val uid: String,
     val name: String,
-    @PrimaryKey(autoGenerate = true) var uid: Int = 0
+    val email: String
 )
 
 fun User.asUserEntity() = UserEntity(
     this.name,
-    this.uid
+    this.uid,
+    this.email
 )

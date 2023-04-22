@@ -21,10 +21,14 @@ import com.luc.login.data.local.LocalDataSource
 import com.luc.login.domain.UserRepository
 import com.luc.login.data.local.LocalDatabase
 import com.luc.login.data.local.dao.UserDao
-import com.luc.login.data.remote.firebase.FirestoreDataSource
+import com.luc.login.data.remote.firebase.firestore.FirestoreDataSource
 import com.luc.login.data.repository.UserRepositoryImpl
 import androidx.room.Room
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.luc.login.data.remote.firebase.auth.AuthenticationDataSource
+import com.luc.login.data.repository.AuthenticationRepositoryImpl
+import com.luc.login.domain.AuthenticationRepository
 import org.koin.android.ext.koin.androidApplication
 import org.koin.dsl.module
 
@@ -32,7 +36,16 @@ private val firestoreModule = module {
     single { FirebaseFirestore.getInstance() }
     single {
         FirestoreDataSource(
-            firebaseFirestore = get(),
+            firebaseFirestore = get()
+        )
+    }
+}
+
+private val authenticationModule = module {
+    single { FirebaseAuth.getInstance() }
+    single {
+        AuthenticationDataSource(
+            firebaseAuth = get()
         )
     }
 }
@@ -41,6 +54,9 @@ private val repositoryModule = module {
     factory { LocalDataSource(get()) }
     factory<UserRepository> {
         UserRepositoryImpl(get(), get())
+    }
+    factory<AuthenticationRepository> {
+        AuthenticationRepositoryImpl(get())
     }
 }
 
@@ -59,4 +75,4 @@ private val roomModule = module {
     single { provideUserDao(get()) }
 }
 
-val dataModule = listOf(roomModule, firestoreModule, repositoryModule, )
+val dataModule = listOf(roomModule, firestoreModule, authenticationModule, repositoryModule)
