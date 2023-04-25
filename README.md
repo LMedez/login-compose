@@ -1,6 +1,6 @@
 ## Screenshots
 
-<img src="header.png" alt="screenshot">
+<img src="screenshots/header.png" alt="screenshot">
 
 
 ### 🖼️ UI
