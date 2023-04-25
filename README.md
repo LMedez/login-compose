@@ -1,5 +1,8 @@
 ## Login system created with Jetpack Compose and Firebase
 
+This app allows you to Sign in with Google and Facebook (Not implemented yet).
+Note: Make sure to add the google-services.json, previously created in [Firebase console](https://console.firebase.google.com/)
+
 ### Screenshots
 
 <img src="screenshots/header.png" alt="screenshot">
