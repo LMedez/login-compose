@@ -1,6 +1,6 @@
-### Login system created with Jetpack Compose and Firebase
+## Login system created with Jetpack Compose and Firebase
 
-## Screenshots
+### Screenshots
 
 <img src="screenshots/header.png" alt="screenshot">
 
