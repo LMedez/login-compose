@@ -1,7 +1,10 @@
 package com.luc.login.ui
 
+import android.app.Activity
 import android.content.res.Configuration
 import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
@@ -11,15 +14,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.google.android.gms.common.api.ApiException
 import com.luc.login.R
 import com.luc.login.domain.model.User
 import com.luc.login.presentation.viewmodel.AuthViewModel
-import com.luc.login.ui.common.LoginButton
+import com.luc.login.ui.common.AuthResultContract
+import com.luc.login.ui.common.CommonLoginButton
+import com.luc.login.ui.common.FacebookLoginActivity
 import com.luc.login.ui.common.LoginTextField
 import com.luc.login.ui.theme.MainApplicationTheme
 import org.koin.androidx.compose.getViewModel
@@ -30,6 +37,8 @@ fun SignInScreen(navigateToSignUp: () -> Unit, navigateToHome: (User) -> Unit) {
     val userAuthViewModel: AuthViewModel = getViewModel()
     val userCredentialState by userAuthViewModel.userCredentialsStatus.collectAsState()
     val userState by userAuthViewModel.user.collectAsState()
+    val signInRequestCode = 1
+    val context = LocalContext.current
 
     var enabledButton by remember {
         mutableStateOf(false)
@@ -43,6 +52,23 @@ fun SignInScreen(navigateToSignUp: () -> Unit, navigateToHome: (User) -> Unit) {
     userState.error?.let {
         Log.d("tests", it)
     }
+
+    val authResultLauncher =
+        rememberLauncherForActivityResult(contract = AuthResultContract()) { task ->
+            try {
+                val account = task?.getResult(ApiException::class.java)
+                if (account != null)
+                    userAuthViewModel.signUpWithGoogle(account.idToken!!)
+            } catch (e: ApiException) { }
+        }
+
+    val facebookAuthResultLauncher =
+        rememberLauncherForActivityResult(contract = ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK && result.data != null) {
+                val data = result.data?.getStringExtra(FacebookLoginActivity.EXTRA_DATA_FB)
+                userAuthViewModel.signUpWithFacebook(data!!)
+            }
+        }
 
     Column(
         Modifier
@@ -80,7 +106,6 @@ fun SignInScreen(navigateToSignUp: () -> Unit, navigateToHome: (User) -> Unit) {
                 userAuthViewModel.validatePassword(it)
             }
         )
-
         SignInDefaultButton(
             enabled = enabledButton,
             onClick = {
@@ -89,6 +114,18 @@ fun SignInScreen(navigateToSignUp: () -> Unit, navigateToHome: (User) -> Unit) {
                     userCredentialState.password
                 )
             })
+
+        OrDivider()
+
+        SignUpBrandButton(onClick = {
+            authResultLauncher.launch(signInRequestCode)
+        }, text = "Sign up with Google")
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        SignUpBrandButton(onClick = {
+            facebookAuthResultLauncher.launch(FacebookLoginActivity.getInstance(context))
+        }, text = "Sign up with Facebook", painter = painterResource(id = R.drawable.facebook))
 
         Spacer(modifier = Modifier.weight(1f))
 
@@ -99,17 +136,13 @@ fun SignInScreen(navigateToSignUp: () -> Unit, navigateToHome: (User) -> Unit) {
 @Composable
 fun SignInDefaultButton(enabled: Boolean = false, onClick: () -> Unit) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        LoginButton(
+        CommonLoginButton(
             onClick = onClick,
             text = "Continue",
             modifier = Modifier.fillMaxWidth(),
             paddingValues = PaddingValues(top = 30.dp),
             enabled = enabled
         )
-        OrDivider()
-        SignUpBrandButton(text = "Sign up with Google")
-        Spacer(modifier = Modifier.height(20.dp))
-        SignUpBrandButton(text = "Sign up with Facebook", painterResource(id = R.drawable.facebook))
     }
 }
 
@@ -139,11 +172,12 @@ fun OrDivider() {
 
 @Composable
 fun SignUpBrandButton(
+    onClick: () -> Unit,
     text: String,
     painter: Painter = painterResource(id = com.google.firebase.firestore.R.drawable.googleg_standard_color_18),
 ) {
     Button(
-        onClick = { /*TODO*/ },
+        onClick = { onClick() },
         border = BorderStroke(1.5.dp, MaterialTheme.colorScheme.surfaceTint.copy(alpha = 0.2f)),
         colors = ButtonDefaults.buttonColors(
             containerColor = MaterialTheme.colorScheme.surface,
@@ -202,7 +236,7 @@ fun HeaderLogo() {
 private fun NightPreview() {
     MainApplicationTheme {
         Surface(color = MaterialTheme.colorScheme.background) {
-            SignInScreen({},{})
+            SignInScreen({}, {})
         }
     }
 }
@@ -212,7 +246,7 @@ private fun NightPreview() {
 private fun LightPreview() {
     MainApplicationTheme {
         Surface(color = MaterialTheme.colorScheme.background) {
-            SignInScreen({},{})
+            SignInScreen({}, {})
         }
     }
 }
@@ -226,8 +260,4 @@ fun TextFieldsPreview() {
         }
     }
 }
-
-private fun credentialValidator(email: String = "", password: String = "") =
-    email.length in 4..9 && password.length > 8
-
 

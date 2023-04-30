@@ -40,6 +40,43 @@ class AuthViewModel(
         }
     }
 
+    fun signUpWithGoogle(idToken: String) {
+        viewModelScope.launch {
+            when (val result = authenticationRepository.signUpWithGoogle(idToken)) {
+                is ResultStatus.Error -> _user.update {
+                    it.copy(
+                        error = result.exception?.message,
+                        loading = false
+                    )
+                }
+                is ResultStatus.Success -> _user.update {
+                    it.copy(
+                        user = result.data,
+                        loading = false
+                    )
+                }
+            }
+        }
+    }
+
+    fun signUpWithFacebook(idToken: String) {
+        viewModelScope.launch {
+            when (val result = authenticationRepository.signUpWithFacebook(idToken)) {
+                is ResultStatus.Error -> _user.update {
+                    it.copy(
+                        error = result.exception?.message,
+                        loading = false
+                    )
+                }
+                is ResultStatus.Success -> _user.update {
+                    it.copy(
+                        user = result.data,
+                        loading = false
+                    )
+                }
+            }
+        }
+    }
     fun validateEmail(email: String) {
         if (Patterns.EMAIL_ADDRESS.matcher(email).matches())
             _userCredentialsStatus.update {

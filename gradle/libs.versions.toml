@@ -19,6 +19,8 @@ ksp = "1.8.10-1.0.9"
 koin = "3.4.0"
 firebaseBom = "31.1.0"
 googleServices = "4.3.14"
+googlePlayServices = "20.5.0"
+facebookAuth = "[4,5)"
 gson = "2.10.1"
 constraintLayout = "1.1.0-alpha07"
 
@@ -50,7 +52,9 @@ koin-android-compose = { module = "io.insert-koin:koin-androidx-compose", versio
 koin-test-junit4 = { module = "io.insert-koin:koin-test-junit4", version.ref = "koin" }
 koin-test-junit5 = { module = "io.insert-koin:koin-test-junit5", version.ref = "koin" }
 koin-test-features = { module = "io.insert-koin:koin-test", version.ref = "koin" }
-gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
+google-gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
+google-playServices = { module = "com.google.android.gms:play-services-auth", version.ref = "googlePlayServices" }
+facebook-auth = { module = "com.facebook.android:facebook-android-sdk", version.ref = "facebookAuth" }
 
 # Firebase
 firebase-bom = { module = "com.google.firebase:firebase-bom" , version.ref = "firebaseBom" }

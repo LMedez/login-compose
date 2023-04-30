@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.dp
 import com.luc.login.R
 
 @Composable
-fun LoginButton(
+fun CommonLoginButton(
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
     text: String,

@@ -18,7 +18,7 @@ import com.luc.login.ui.common.LogoImage
 import com.luc.login.R
 import com.luc.login.domain.model.User
 import com.luc.login.presentation.viewmodel.AuthViewModel
-import com.luc.login.ui.common.LoginButton
+import com.luc.login.ui.common.CommonLoginButton
 import org.koin.androidx.compose.getViewModel
 
 @Composable
@@ -85,7 +85,7 @@ fun SignUpScreen(navigateToSignIn: () -> Unit, navigateToHome: (User) -> Unit) {
             }
         )
 
-        LoginButton(
+        CommonLoginButton(
             Modifier.fillMaxWidth(),
             onClick = { userAuthViewModel.signUpDefault(userCredentialState.email, userCredentialState.password) },
             text = "Create account",

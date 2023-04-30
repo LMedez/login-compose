@@ -25,4 +25,9 @@
     <string name="full_name">Full name</string>
     <string name="email_example">example.name@domain.com</string>
     <string name="password_example">min. 8 characters</string>
+
+    <string name="facebook_app_id">your id</string>
+    <string name="fb_login_protocol_scheme">your token</string>
+    <string name="facebook_client_token">your client token</string>
+
 </resources>
