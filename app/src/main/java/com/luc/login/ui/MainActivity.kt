@@ -17,14 +17,14 @@
 package com.luc.login.ui
 
 import android.os.Bundle
-import com.luc.login.ui.navigation.MainNavigation
-import com.luc.login.ui.theme.MainApplicationTheme
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
+import com.luc.login.ui.navigation.MainNavigation
+import com.luc.login.ui.theme.MainApplicationTheme
 
 class MainActivity : ComponentActivity() {
 

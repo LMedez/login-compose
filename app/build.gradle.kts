@@ -88,14 +88,17 @@ dependencies {
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.constraint.layout)
 
-    // Gson
-    implementation(libs.gson)
+    // Facebook auth
+    implementation(libs.facebook.auth)
 
-    // Koin
+    // Google
+    implementation(libs.google.gson)
+    implementation(libs.google.playServices)
+
+    // Koin and instrumented tests.
     implementation(libs.koin.android)
     implementation(libs.koin.android.compose)
 
-    // Koin and instrumented tests.
     testImplementation(libs.koin.test.junit4)
     testImplementation(libs.koin.test.junit5)
     testImplementation(libs.koin.test.features)
